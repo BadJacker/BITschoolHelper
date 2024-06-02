@@ -15,7 +15,8 @@ import {
   Card,
   Sticky,
   Tabbar,
-  TabbarItem
+  TabbarItem,
+  Lazyload
 } from 'vant'
 import 'vant/lib/index.css'
 
@@ -36,3 +37,6 @@ app.use(Card)
 app.use(Sticky)
 app.use(Tabbar)
 app.use(TabbarItem)
+app.use(Lazyload, {
+  lazyComponent: true
+})

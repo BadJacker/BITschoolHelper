@@ -17,8 +17,12 @@ const router = createRouter({
           component: () => import('@/views/layout/HomePage.vue')
         },
         {
-          path: '/layout/cart',
-          component: () => import('@/views/layout/CartPage.vue')
+          path: '/layout/order',
+          component: () => import('@/views/layout/OrderPage.vue')
+        },
+        {
+          path: '/layout/post',
+          component: () => import('@/views/layout/PostPage.vue')
         },
         {
           path: '/layout/message',

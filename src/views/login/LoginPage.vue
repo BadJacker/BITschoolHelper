@@ -24,7 +24,7 @@
             placeholder="请输入图形验证码"
             type="text"
           />
-          <img src="@/assets/code.png" alt="" />
+          <img src="@/assets/img/code.png" alt="" />
         </div>
         <div class="form-item">
           <input class="inp" placeholder="请输入短信验证码" type="text" />
