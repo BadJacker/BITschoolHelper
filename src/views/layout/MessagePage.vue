@@ -6,7 +6,7 @@
           name="arrow-left"
           size="20"
           style="margin-left: 10px"
-          @click="onClickLeft"
+          @click="toggleSidebar"
         />
       </div>
       <strong>{{ userName }}</strong>
@@ -53,12 +53,32 @@
         </template>
       </van-field>
     </div>
+    <div v-if="showSidebar" class="sidebar">
+      <div class="sidebar-header">
+        <span>好友列表</span>
+        <van-icon name="close" size="20" @click="toggleSidebar"/>
+      </div>
+      <div class="friend-list">
+        <div class="friend-item" v-for="friend in friendsList" :key="friend.name" @click="selectFriend(friend)">
+          <van-image round width="40px" height="40px" :src="friend.avatar" />
+          <span>{{ friend.name }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import userPic1 from '@/assets/img/userPic1.jpg';
 import userPic2 from '@/assets/img/userPic2.jpeg';
+import userPic3 from '@/assets/img/userPic3.jpg'
+import userPic4 from '@/assets/img/userPic4.jpg'
+import userPic5 from '@/assets/img/userPic5.jpg'
+import userPic6 from '@/assets/img/userPic6.jpg'
+import userPic7 from '@/assets/img/userPic7.jpeg'
+import userPic8 from '@/assets/img/userPic8.jpg'
+import userPic9 from '@/assets/img/userPic9.png'
+import userPic10 from '@/assets/img/userPic10.jpg'
 
 export default {
   data() {
@@ -66,7 +86,7 @@ export default {
       chatList: [
         {
           url: userPic2,
-          username: "客户",
+          username: "Alice",
           content: "23333·123233331232333312323333123",
           position: "left",
         },
@@ -78,7 +98,7 @@ export default {
         },
         {
           url: userPic2,
-          username: "客户",
+          username: "Alice",
           content: "23333123",
           position: "left",
         },
@@ -96,7 +116,7 @@ export default {
         },
         {
           url: userPic2,
-          username: "客户",
+          username: "Alice",
           content: "23333123",
           position: "left",
         },
@@ -108,7 +128,7 @@ export default {
         },
         {
           url: userPic2,
-          username: "客户",
+          username: "Alice",
           content: "23333123",
           position: "left",
         },
@@ -120,7 +140,7 @@ export default {
         },
         {
           url: userPic2,
-          username: "客户",
+          username: "Alice",
           content: "23333123",
           position: "left",
         },
@@ -132,7 +152,7 @@ export default {
         },
         {
           url: userPic2,
-          username: "客户",
+          username: "Alice",
           content: "23333123",
           position: "left",
         },
@@ -143,35 +163,35 @@ export default {
           position: "right",
         },
       ],
-      userName: "客户",
+      userName: "Alice",
       inputValue: "",
-      scrollTop: 0
+      friendsList: [
+        { name: "Alice", avatar: userPic2 },
+        { name: "Bob", avatar: userPic3 },
+        { name: "Charlie", avatar: userPic4 },
+        // 其他好友数据
+      ],
+      showSidebar: false
     };
   },
   mounted() {
-    this.setPageScrollTo();
-    this.$refs.scrollBox.addEventListener('scroll', this.srTop);
+    this.scrollToBottom();
   },
   methods: {
+    toggleSidebar() {
+      this.showSidebar = !this.showSidebar;
+    },
     onClickLeft() {
       console.log("返回");
     },
     onClickRight() {
       console.log("按钮");
     },
-    setPageScrollTo() {
-      this.scrollTop = this.$refs.scrollBox.scrollHeight;
-      setTimeout(() => {
-        if (this.scrollTop != this.$refs.scrollBox.scrollHeight) {
-          this.scrollTop = this.$refs.scrollBox.scrollHeight;
-        }
-      }, 100);
-      this.$refs.scrollBox.scrollTop = this.scrollTop;
-    },
-    srTop() {
-      if (this.$refs.scrollBox.scrollTop == 0) {
-        console.log('到顶了，滚动条位置 :', this.$refs.scrollBox.scrollTop);
-      }
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const scrollBox = this.$refs.scrollBox;
+        scrollBox.scrollTop = scrollBox.scrollHeight;
+      });
     },
     sendOut() {
       if (this.inputValue.trim() !== "") {
@@ -183,12 +203,19 @@ export default {
         };
         this.chatList.push(newMessage);
         this.inputValue = "";
-        this.$nextTick(() => {
-          this.scrollTop = this.$refs.scrollBox.scrollHeight;
-          this.$refs.scrollBox.scrollTop = this.scrollTop;
-        });
+        this.scrollToBottom();
         console.log('发送成功');
       }
+    },
+    selectFriend(friend) {
+      this.userName = friend.name;
+      this.chatList.forEach(message => {
+        if (message.position === 'left') {
+          message.username = friend.name;
+          message.url = friend.avatar;
+        }
+      });
+      this.showSidebar = false;
     }
   }
 };
@@ -208,6 +235,7 @@ html, body {
   height: 100vh;
   width: 100%;
   overflow: hidden;
+  position: relative;
 }
 
 .title {
@@ -296,5 +324,44 @@ html, body {
   word-break: break-all;
   margin-top: 3px;
   font-size: 14px;
+}
+
+.sidebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100%;
+  background-color: white;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #4fc08d;
+  color: black;
+}
+
+.friend-list {
+  flex: 1;
+  overflow: auto;
+  padding: 10px;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.friend-item img {
+  margin-right: 10px;
 }
 </style>
