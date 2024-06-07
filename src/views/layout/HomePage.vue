@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 //搜索值
 const value = ref('')
@@ -17,6 +17,62 @@ const onRefresh = () => {
 let count = ref(5)
 const loading = ref(false)
 const finished = ref(false)
+
+// 推荐列表
+const recommendItems = ref([])
+
+onMounted(async () => {
+  try {
+    const response = await fetch(
+      'http://127.0.0.1:4523/m1/4522279-4169800-default/goods'
+    )
+    recommendItems.value = await response.json()
+  } catch (error) {
+    console.error('Error fetching recommendList:', error)
+  }
+})
+
+// 事务求助列表
+const issueItems = ref([])
+
+onMounted(async () => {
+  try {
+    const response = await fetch(
+      'http://127.0.0.1:4523/m1/4522279-4169800-default/goods'
+    )
+    issueItems.value = await response.json()
+  } catch (error) {
+    console.error('Error fetching issueList:', error)
+  }
+})
+
+// 二手交易列表
+const transactionItems = ref([])
+
+onMounted(async () => {
+  try {
+    const response = await fetch(
+      'http://127.0.0.1:4523/m1/4522279-4169800-default/goods'
+    )
+    transactionItems.value = await response.json()
+  } catch (error) {
+    console.error('Error fetching transactionList:', error)
+  }
+})
+
+// 活动招聘列表
+const recruitmentItems = ref([])
+
+onMounted(async () => {
+  try {
+    const response = await fetch(
+      'http://127.0.0.1:4523/m1/4522279-4169800-default/goods'
+    )
+    recruitmentItems.value = await response.json()
+  } catch (error) {
+    console.error('Error fetching recruitmentList:', error)
+  }
+})
 
 const onLoad = () => {
   // 异步更新数据
@@ -68,21 +124,21 @@ const onLoad = () => {
             finished-text="没有更多了"
             @load="onLoad"
           >
-            <span v-for="item in count" :key="item">
+            <span v-for="item in recommendItems.slice(0, count)" :key="item.id">
               <van-swipe-cell>
                 <van-card
                   class="goods-card"
-                  num="2"
-                  price="2.00"
-                  tag="标签"
-                  desc="描述信息"
-                  title="商品标题"
-                  thumb="https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
-                  origin-price="10.00"
+                  :num="item.num"
+                  :price="item.price.toFixed(2)"
+                  :title="item.title"
+                  :desc="item.intro"
                   @click="$router.push('/product')"
                 >
-                  <template #footer>
-                    <van-button size="mini" round>删除</van-button>
+                  <template #tags>
+                    <div class="time-container">
+                      <van-icon name="notes-o" :size="`${3.5}vw`" />
+                      <div>发布时间 {{ item.time }}</div>
+                    </div>
                   </template>
                 </van-card>
                 <template #right>
@@ -99,9 +155,159 @@ const onLoad = () => {
         </van-pull-refresh>
         <van-back-top right="10vw" bottom="12vh" />
       </van-tab>
-      <van-tab title="模块1">内容 2</van-tab>
-      <van-tab title="模块2">内容 3</van-tab>
-      <van-tab title="模块3">内容 4</van-tab>
+      <van-tab title="事务求助">
+        <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
+          <van-swipe-item>事务求助轮播1</van-swipe-item>
+          <van-swipe-item>事务求助轮播2</van-swipe-item>
+          <van-swipe-item>事务求助轮播3</van-swipe-item>
+          <van-swipe-item>事务求助轮播4</van-swipe-item>
+        </van-swipe>
+        <van-pull-refresh
+          v-model="isLoading"
+          success-text="刷新成功"
+          @refresh="onRefresh"
+        >
+          <van-list
+            v-model:loading="loading"
+            :finished="finished"
+            finished-text="没有更多了"
+            @load="onLoad"
+          >
+            <span v-for="item in issueItems.slice(0, count)" :key="item.id">
+              <van-swipe-cell>
+                <van-card
+                  class="goods-card"
+                  :num="item.num"
+                  :price="item.price.toFixed(2)"
+                  :title="item.title"
+                  :desc="item.intro"
+                  @click="$router.push('/product')"
+                >
+                  <template #tags>
+                    <div class="time-container">
+                      <van-icon name="notes-o" :size="`${3.5}vw`" />
+                      <div>发布时间 {{ item.time }}</div>
+                    </div>
+                  </template>
+                </van-card>
+                <template #right>
+                  <van-button
+                    square
+                    text="删除"
+                    type="danger"
+                    class="delete-button"
+                  />
+                </template>
+              </van-swipe-cell>
+            </span>
+          </van-list>
+        </van-pull-refresh>
+        <van-back-top right="10vw" bottom="12vh" />
+      </van-tab>
+      <van-tab title="二手交易">
+        <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
+          <van-swipe-item>二手交易轮播1</van-swipe-item>
+          <van-swipe-item>二手交易轮播2</van-swipe-item>
+          <van-swipe-item>二手交易轮播3</van-swipe-item>
+          <van-swipe-item>二手交易轮播4</van-swipe-item>
+        </van-swipe>
+        <van-pull-refresh
+          v-model="isLoading"
+          success-text="刷新成功"
+          @refresh="onRefresh"
+        >
+          <van-list
+            v-model:loading="loading"
+            :finished="finished"
+            finished-text="没有更多了"
+            @load="onLoad"
+          >
+            <span
+              v-for="item in transactionItems.slice(0, count)"
+              :key="item.id"
+            >
+              <van-swipe-cell>
+                <van-card
+                  class="goods-card"
+                  :num="item.num"
+                  :price="item.price.toFixed(2)"
+                  :title="item.title"
+                  :desc="item.intro"
+                  @click="$router.push('/product')"
+                >
+                  <template #tags>
+                    <div class="time-container">
+                      <van-icon name="notes-o" :size="`${3.5}vw`" />
+                      <div>发布时间 {{ item.time }}</div>
+                    </div>
+                  </template>
+                </van-card>
+                <template #right>
+                  <van-button
+                    square
+                    text="删除"
+                    type="danger"
+                    class="delete-button"
+                  />
+                </template>
+              </van-swipe-cell>
+            </span>
+          </van-list>
+        </van-pull-refresh>
+        <van-back-top right="10vw" bottom="12vh" />
+      </van-tab>
+      <van-tab title="活动招聘">
+        <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
+          <van-swipe-item>活动招聘轮播1</van-swipe-item>
+          <van-swipe-item>活动招聘轮播2</van-swipe-item>
+          <van-swipe-item>活动招聘轮播3</van-swipe-item>
+          <van-swipe-item>活动招聘轮播4</van-swipe-item>
+        </van-swipe>
+        <van-pull-refresh
+          v-model="isLoading"
+          success-text="刷新成功"
+          @refresh="onRefresh"
+        >
+          <van-list
+            v-model:loading="loading"
+            :finished="finished"
+            finished-text="没有更多了"
+            @load="onLoad"
+          >
+            <span
+              v-for="item in recruitmentItems.slice(0, count)"
+              :key="item.id"
+            >
+              <van-swipe-cell>
+                <van-card
+                  class="goods-card"
+                  :num="item.num"
+                  :price="item.price.toFixed(2)"
+                  :title="item.title"
+                  :desc="item.intro"
+                  @click="$router.push('/product')"
+                >
+                  <template #tags>
+                    <div class="time-container">
+                      <van-icon name="notes-o" :size="`${3.5}vw`" />
+                      <div>发布时间 {{ item.time }}</div>
+                    </div>
+                  </template>
+                </van-card>
+                <template #right>
+                  <van-button
+                    square
+                    text="删除"
+                    type="danger"
+                    class="delete-button"
+                  />
+                </template>
+              </van-swipe-cell>
+            </span>
+          </van-list>
+        </van-pull-refresh>
+        <van-back-top right="10vw" bottom="12vh" />
+      </van-tab>
     </van-tabs>
   </div>
 </template>
@@ -129,5 +335,11 @@ const onLoad = () => {
 // 侧边按钮
 .delete-button {
   height: 100%;
+}
+// 发布时间
+.time-container {
+  display: flex;
+  align-items: center;
+  color: #999;
 }
 </style>
