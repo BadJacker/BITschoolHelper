@@ -48,7 +48,7 @@ const router = createRouter({
     },
     {
       path: '/order',
-      component: () => import('@/views/order/OrderPage.vue')
+      component: () => import('@/views/order/OrderDetail.vue')
     },
     {
       path: '/pay',

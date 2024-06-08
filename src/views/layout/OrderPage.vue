@@ -18,22 +18,22 @@
           @load="onLoad"
           :offset="10"
         >
-          <div v-for="(item, index) in filteredList" :key="index" class="order-item-box">
-            <div class="order-item-header">
-              <span>{{ getTagName(item[1].type) }}</span>
-            </div>
-            <div class="order-item-content">
-              <img class="order-item-image" :src="'https://fastly.jsdelivr.net/npm/@vant/assets/leaf.jpeg'" alt="商品图片" />
-              <div class="order-item-info">
-                <div class="order-item-title">{{ item[1].title }}</div>
-                <div class="order-item-details">购买数量: {{ item[1].num }} 总价格: {{ item[1].price }}</div>
-                <div class="order-item-buttons" v-if="item[0] === 1">
-                  <van-button type="primary" size="small" @click="showRatingDialog(item)">确认完成</van-button>
-                  <van-button type="default" size="small">取消订单</van-button>
-                </div>
+        <div v-for="(item, index) in filteredList" :key="index" class="order-item-box">
+          <div class="order-item-header">
+            <span>{{ getTagName(item[1].type) }}</span>
+          </div>
+          <div class="order-item-content" @click="goTo(item[1].id)">
+            <img class="order-item-image" :src="'https://fastly.jsdelivr.net/npm/@vant/assets/leaf.jpeg'" alt="商品图片" />
+            <div class="order-item-info">
+              <div class="order-item-title">{{ item[1].title }}</div>
+              <div class="order-item-details">购买数量: {{ item[1].num }} 总价格: {{ item[1].price }}</div>
+              <div class="order-item-buttons" v-if="item[0] === 1">
+                <van-button type="primary" size="small" @click.stop="showRatingDialog(item)">确认完成</van-button>
+                <van-button type="default" size="small">取消订单</van-button>
               </div>
             </div>
           </div>
+        </div>
         </van-list>
       </van-pull-refresh>
     </div>
@@ -46,7 +46,6 @@
 <script setup>
 import { reactive, ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { Dialog, Button, Tabs, Tab, PullRefresh, List, Rate } from 'vant';
 
 class Goods {
   constructor(id, intro, num, price, time, title, type, user) {
@@ -112,7 +111,7 @@ const filterList = () => {
 };
 
 const goTo = (id) => {
-  router.push({ path: '/order-detail', query: { id } });
+  router.push({ path: '/order', query: { id } });
 };
 
 const onLoad = () => {
