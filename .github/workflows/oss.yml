@@ -22,7 +22,7 @@ jobs:
         run: |
           echo "LTAI5tBYkBH379RrYc3NEnXr"
           echo "taxLpRSrGDXVXAC5l1bgAODC09UW3J"
-          pnpm install
+          pnpm install --no-frozen-lockfile
           pnpm build
       # 上传到OSS
       - name: aliyun-oss-website-action
