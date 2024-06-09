@@ -23,9 +23,7 @@ const recommendItems = ref([])
 
 onMounted(async () => {
   try {
-    const response = await fetch(
-      'http://127.0.0.1:4523/m1/4522279-4169800-default/goods'
-    )
+    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081')
     recommendItems.value = await response.json()
   } catch (error) {
     console.error('Error fetching recommendList:', error)
@@ -37,9 +35,7 @@ const issueItems = ref([])
 
 onMounted(async () => {
   try {
-    const response = await fetch(
-      'http://127.0.0.1:4523/m1/4522279-4169800-default/goods'
-    )
+    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081')
     issueItems.value = await response.json()
   } catch (error) {
     console.error('Error fetching issueList:', error)
@@ -51,9 +47,7 @@ const transactionItems = ref([])
 
 onMounted(async () => {
   try {
-    const response = await fetch(
-      'http://127.0.0.1:4523/m1/4522279-4169800-default/goods'
-    )
+    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081')
     transactionItems.value = await response.json()
   } catch (error) {
     console.error('Error fetching transactionList:', error)
@@ -65,9 +59,7 @@ const recruitmentItems = ref([])
 
 onMounted(async () => {
   try {
-    const response = await fetch(
-      'http://127.0.0.1:4523/m1/4522279-4169800-default/goods'
-    )
+    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081')
     recruitmentItems.value = await response.json()
   } catch (error) {
     console.error('Error fetching recruitmentList:', error)

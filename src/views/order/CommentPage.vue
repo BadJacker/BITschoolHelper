@@ -2,7 +2,7 @@
   <div class="order-detail-box">
     <div class="order-header">
       <span @click="goBack" class="back-icon">&lt;</span>
-      <span class="order-title">订单详情</span>
+      <span class="order-title">订单评价</span>
     </div>
     <div class="order-tabs">
       <van-tabs v-model="active" type="card">
@@ -12,7 +12,7 @@
     <div class="order-content">
       <div class="order-info">
         <div class="order-image">
-          <img :src="order.image" alt="商品图片">
+          <img :src="order.image" alt="商品图片" />
         </div>
         <div class="order-details">
           <p><strong>商品名称:</strong> {{ order.title }}</p>
@@ -28,25 +28,30 @@
         <p><strong>发布用户:</strong> {{ order.user.name }}</p>
         <p><strong>接受用户:</strong> 我</p>
       </div>
-      <div class="order-actions">
-        <van-button type="primary" size="small" @click="contactUser">联系对方</van-button>
-        <van-button type="success" size="small" @click="showRatingDialog">确认完成</van-button>
-        <van-button type="danger" size="small" @click="cancelOrder">取消订单</van-button>
-      </div>
     </div>
-    <van-dialog v-model:show="showRating" title="请评价" show-cancel-button show-confirm-button @confirm="onRateConfirm">
-      <van-rate v-model="rating" />
-    </van-dialog>
+  </div>
+  <div class="">
+    <div class="mark-box">
+      <p>
+        <strong>评分：<van-rate v-model="star" /></strong>
+      </p>
+    </div>
+    <div class="comment-box">
+      <p><strong>评论：</strong></p>
+      <textarea v-model="content" rows="4" cols="50"></textarea>
+    </div>
+    <button @click="submit">提交</button>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { Tabs, Tab, Dialog, Rate } from 'vant';
+//import { ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { Tabs, Tab, Dialog, Rate } from 'vant'
 
-const router = useRouter();
-const route = useRoute();
+const router = useRouter()
+const route = useRoute()
 
 const order = reactive({
   id: '',
@@ -58,10 +63,10 @@ const order = reactive({
   type: '',
   user: { name: '' },
   image: 'https://fastly.jsdelivr.net/npm/@vant/assets/leaf.jpeg' // 示例图片地址
-});
+})
 
-const showRating = ref(false);
-const rating = ref(0);
+const showRating = ref(false)
+const rating = ref(0)
 
 const fetchOrderDetail = (id) => {
   // 模拟获取订单详情
@@ -74,53 +79,72 @@ const fetchOrderDetail = (id) => {
     time: '2024-06-01 12:00:00',
     type: 2,
     user: { name: '用户1' }
-  };
-  Object.assign(order, orderDetail);
-};
+  }
+  Object.assign(order, orderDetail)
+}
 
 const goBack = () => {
-  router.back();
-};
+  router.back()
+}
 
-const contactUser = () => {
-};
-
-const confirmOrder = () => {
-};
-
-const cancelOrder = () => {
-};
+onMounted(() => {
+  const orderId = route.query.id
+  fetchOrderDetail(orderId)
+})
 
 const getTagName = (type) => {
   switch (type) {
     case 1:
-      return '事务求助';
+      return '事务求助'
     case 2:
-      return '二手交易';
+      return '二手交易'
     case 3:
-      return '活动招募';
+      return '活动招募'
     default:
-      return '';
+      return ''
   }
-};
+}
 
-const showRatingDialog = () => {
-  //showRating.value = true
-  router.push('/comment')
-};
+const star = ref(0)
+const content = ref('')
+//TODO
+const orderId = ref(1)
 
-const onRateConfirm = () => {
-  // 处理评分逻辑，这里可以根据 rating 的值做相应的处理
-  showRating.value = false;
-};
+const submit = () => {
+  console.log('评分:', star.value)
+  console.log('评论:', content.value)
 
-onMounted(() => {
-  const orderId = route.query.id;
-  fetchOrderDetail(orderId);
-});
+  var myHeaders = new Headers()
+  myHeaders.append('User-Agent', 'Apifox/1.0.0 (https://apifox.com)')
+  myHeaders.append('Content-Type', 'application/json')
+  myHeaders.append(
+    'Fake-Cookie',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMiLCJleHAiOjE3MTk4MjYwMTgsImFkbWluIjpmYWxzZX0.kXlzy4EjJfCB-ViANhdRMRrp_lM5_ICXGg-y090g1Ho'
+  )
+
+  var raw = JSON.stringify({
+    star: star.value,
+    content: content.value
+  })
+
+  var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: raw,
+    redirect: 'follow'
+  }
+
+  fetch(
+    `http://dev.bit101.flwfdd.xyz:8081/orders/review/${orderId.value}`,
+    requestOptions
+  )
+    .then((response) => response.text())
+    .then((result) => console.log(result))
+    .catch((error) => console.log('error', error))
+}
 </script>
 
-<style scoped>
+<style>
 .order-detail-box {
   padding: 16px;
   .order-header {
@@ -178,5 +202,12 @@ onMounted(() => {
       }
     }
   }
+}
+.mark-box {
+  p {
+    margin: 8px 0;
+  }
+  display: flex;
+  align-items: center;
 }
 </style>
