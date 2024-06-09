@@ -1,0 +1,50 @@
+name: Publish to OSS
+
+on:
+  push:
+    branches:
+      - main # 这里可以根据您的需要更改分支名称
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      # 安装Node.js
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.8.1
+      # 安装pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+      # 执行应用打包步骤
+      - name: Install dependencies and build
+        run: |
+          echo "LTAI5tBYkBH379RrYc3NEnXr"
+          echo "taxLpRSrGDXVXAC5l1bgAODC09UW3J"
+          pnpm install
+          pnpm build
+      # 上传到OSS
+      - name: aliyun-oss-website-action
+        uses: fangbinwei/aliyun-oss-website-action@v1.4.0
+        with:
+          # Folder which contains the website files
+          folder: ./dist/
+          # Aliyun OSS accessKeyId.
+          accessKeyId: LTAI5tBYkBH379RrYc3NEnXr
+          # Aliyun OSS accessKeySecret.
+          accessKeySecret: taxLpRSrGDXVXAC5l1bgAODC09UW3J
+          # Aliyun OSS bucket instance.
+          bucket: bit-helper-page
+          # OSS region domain
+          endpoint: oss-cn-hongkong.aliyuncs.com
+          # `true` to identify the endpoint is your custom domain.
+          cname: false # optional, default is false
+          # `true` to skip setting static pages related configuration. `indexPage`, `notFoundPage` will not be used.
+          skipSetting: true # optional, default is false
+          # Save info of uploaded files to increase next upload speed
+          incremental: true # optional, default is true
+          # index page
+          indexPage: index.html # optional, default is index.html
+          # not found page
+          notFoundPage: index.html # optional, default is 404.html
