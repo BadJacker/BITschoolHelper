@@ -30,17 +30,22 @@
       </div>
     </div>
   </div>
-  <div class="">
+  <div class="mark-comment-box">
     <div class="mark-box">
       <p>
         <strong>评分：<van-rate v-model="star" /></strong>
       </p>
     </div>
     <div class="comment-box">
-      <p><strong>评论：</strong></p>
-      <textarea v-model="content" rows="4" cols="50"></textarea>
+      <textarea
+        v-model="content"
+        rows="4"
+        cols="50"
+        placeholder="展开说说对对方的评价吧…"
+        ref="commentInput"
+      ></textarea>
+      <button class="submit-button" @click="submit">提交</button>
     </div>
-    <button @click="submit">提交</button>
   </div>
 </template>
 
@@ -48,7 +53,6 @@
 //import { ref } from 'vue'
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Tabs, Tab, Dialog, Rate } from 'vant'
 
 const router = useRouter()
 const route = useRoute()
@@ -64,9 +68,6 @@ const order = reactive({
   user: { name: '' },
   image: 'https://fastly.jsdelivr.net/npm/@vant/assets/leaf.jpeg' // 示例图片地址
 })
-
-const showRating = ref(false)
-const rating = ref(0)
 
 const fetchOrderDetail = (id) => {
   // 模拟获取订单详情
@@ -105,12 +106,18 @@ const getTagName = (type) => {
   }
 }
 
-const star = ref(0)
+const star = ref(3)
 const content = ref('')
 //TODO
 const orderId = ref(1)
+const commentInput = ref(null) // 用于引用文本框元素
 
 const submit = () => {
+  if (content.value.trim() === '') {
+    alert('评论不可为空！')
+    return
+  }
+
   console.log('评分:', star.value)
   console.log('评论:', content.value)
 
@@ -142,6 +149,10 @@ const submit = () => {
     .then((result) => console.log(result))
     .catch((error) => console.log('error', error))
 }
+
+onMounted(() => {
+  commentInput.value.focus()
+})
 </script>
 
 <style>
@@ -203,11 +214,64 @@ const submit = () => {
     }
   }
 }
+
 .mark-box {
   p {
     margin: 8px 0;
   }
   display: flex;
   align-items: center;
+}
+
+.mark-comment-box {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.mark-box,
+.comment-box {
+  margin-bottom: 20px;
+}
+
+.mark-box p,
+.comment-box p {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.comment-box {
+  position: relative;
+}
+
+textarea {
+  width: 93.7%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  resize: none;
+  font-size: 14px;
+}
+
+.submit-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.submit-button:hover {
+  background-color: #0056b3;
 }
 </style>
