@@ -4,32 +4,36 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/',
+      redirect: '/login'
+    },
+    {
       path: '/login',
       component: () => import('@/views/login/LoginPage.vue')
     },
     {
-      path: '/',
+      path: '/layout',
       component: () => import('@/views/layout/LayoutPage.vue'),
       redirect: '/layout/home',
       children: [
         {
-          path: '/layout/home',
+          path: 'home',
           component: () => import('@/views/layout/HomePage.vue')
         },
         {
-          path: '/layout/order',
+          path: 'order',
           component: () => import('@/views/layout/OrderPage.vue')
         },
         {
-          path: '/layout/post',
+          path: 'post',
           component: () => import('@/views/layout/PostPage.vue')
         },
         {
-          path: '/layout/message',
+          path: 'message',
           component: () => import('@/views/layout/MessagePage.vue')
         },
         {
-          path: '/layout/user',
+          path: 'user',
           component: () => import('@/views/layout/UserPage.vue')
         }
       ]

@@ -27,10 +27,10 @@
             <div class="order-item-info">
               <div class="order-item-title">{{ item[1].title }}</div>
               <div class="order-item-details">购买数量: {{ item[1].num }} 总价格: {{ item[1].price }}</div>
-              <div class="order-item-buttons" v-if="item[0] === 1">
+              <!-- <div class="order-item-buttons" v-if="item[0] === 1">
                 <van-button type="primary" size="small" @click.stop="showRatingDialog(item)">确认完成</van-button>
                 <van-button type="default" size="small">取消订单</van-button>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
@@ -251,12 +251,12 @@ watch(() => state.status, filterList);
         margin-top: 5px;
         color: #999;
       }
-      .order-item-buttons {
-        display: flex;
-        justify-content: flex-start;
-        gap: 10px;
-        margin-top: 10px;
-      }
+      // .order-item-buttons {
+      //   display: flex;
+      //   justify-content: flex-start;
+      //   gap: 10px;
+      //   margin-top: 10px;
+      // }
     }
   }
 }

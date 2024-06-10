@@ -6,7 +6,7 @@
           name="arrow-left"
           size="20"
           style="margin-left: 10px"
-          @click="toggleSidebar"
+          @click="onClickRight"
         />
       </div>
       <strong>{{ userName }}</strong>
@@ -15,7 +15,7 @@
           name="ellipsis"
           size="22"
           style="margin-right: 10px"
-          @click="onClickRight"
+          @click="toggleSidebar"
         />
       </div>
     </div>
@@ -248,14 +248,16 @@ html, body {
 }
 
 .bottom {
-  height: 50px;
+  height: 70px;
   width: 100%;
   border-top: 1px solid #eaeaea;
   background-color: white;
-  position: sticky;
+  position: fixed;
   bottom: 0;
+  left: 0;
   padding: 10px;
   box-sizing: border-box;
+  z-index: 100;
 }
 
 .content_box {
@@ -263,6 +265,7 @@ html, body {
   overflow: auto;
   padding: 10px;
   box-sizing: border-box;
+  margin-bottom: 70px; /* 给内容区预留空间，避免被底部输入框覆盖 */
 }
 
 .timer {
@@ -329,7 +332,7 @@ html, body {
 .sidebar {
   position: absolute;
   top: 0;
-  left: 0;
+  right: 0;
   width: 250px;
   height: 100%;
   background-color: white;

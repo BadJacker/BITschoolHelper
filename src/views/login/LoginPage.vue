@@ -1,101 +1,120 @@
-<script setup></script>
-
 <template>
-  <div class="login">
-    <van-nav-bar title="登录" left-arrow @click-left="$router.go(-1)" />
-    <div class="container">
-      <div class="title">
-        <h3>手机号登录</h3>
-        <p>未注册的手机号登录后将自动注册</p>
+  <div class="login-container">
+    <h2 class="title">欢迎登录！</h2>
+    <form @submit.prevent="login">
+      <div class="input-group">
+        <van-icon name="user-o" size="20" class="icon" />
+        <input type="text" v-model="username" placeholder="学号" required />
       </div>
-      <div class="form">
-        <div class="form-item">
-          <input
-            class="inp"
-            maxlength="11"
-            placeholder="请输入手机号码"
-            type="text"
-          />
-        </div>
-        <div class="form-item">
-          <input
-            class="inp"
-            maxlength="5"
-            placeholder="请输入图形验证码"
-            type="text"
-          />
-          <img src="@/assets/img/code.png" alt="" />
-        </div>
-        <div class="form-item">
-          <input class="inp" placeholder="请输入短信验证码" type="text" />
-          <button>获取验证码</button>
-        </div>
+      <div class="input-group">
+        <van-icon name="lock" size="20" class="icon" />
+        <input type="password" v-model="password" placeholder="密码" required />
       </div>
-
-      <div class="login-btn">登录</div>
-    </div>
+      <div class="button-container">
+        <button type="submit" class="submit-btn">
+          <van-icon name="arrow" size="20" class="arrow-icon" />
+        </button>
+      </div>
+    </form>
   </div>
 </template>
 
-<style lang="less" scoped>
-.container {
-  padding: 49px 29px;
-  background-color: #fff;
-  .title {
-    margin-bottom: 20px;
-    h3 {
-      font-size: 26px;
-      margin: 0px;
-      font-weight: normal;
-    }
-    p {
-      margin: 0px;
-      line-height: 40px;
-      font-size: 14px;
-      color: #b8b8b8;
+<script>
+export default {
+  name: 'LoginPage',
+  data() {
+    return {
+      username: '',
+      password: ''
+    };
+  },
+  methods: {
+    login() {
+      // 处理登录逻辑，例如调用 API 验证用户凭据
+      // 假设登录成功
+      this.$router.push('/layout/home');
     }
   }
+}
+</script>
 
-  .form-item {
-    border-bottom: 1px solid #f3f1f2;
-    padding: 8px;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    .inp {
-      display: block;
-      border: none;
-      outline: none;
-      height: 32px;
-      font-size: 14px;
-      flex: 1;
-    }
-    img {
-      width: 94px;
-      height: 31px;
-    }
-    button {
-      height: 31px;
-      border: none;
-      font-size: 13px;
-      color: #cea26a;
-      background-color: transparent;
-      padding-right: 9px;
-    }
-  }
+<style scoped>
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #f9f9f9, #e6f7f1);
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
 
-  .login-btn {
-    width: 100%;
-    height: 42px;
-    margin-top: 39px;
-    background: linear-gradient(90deg, #ecb53c, #ff9211);
-    color: #fff;
-    border-radius: 39px;
-    box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.1);
-    letter-spacing: 2px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.title {
+  font-size: 32px;
+  color: #333;
+  margin-bottom: 50px;
+  font-weight: bold;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  background: #fff;
+  border-radius: 25px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 300px; /* 缩小文本框的宽度 */
+  padding: 5px 15px; /* 调整内边距 */
+}
+
+.icon {
+  margin-right: 10px;
+  color: #a0a0a0;
+}
+
+input {
+  flex: 1;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 16px; /* 调整字体大小 */
+  color: #333;
+  padding: 5px; /* 调整内边距 */
+}
+
+input::placeholder {
+  color: #aaa;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: #4caf50;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #45a045;
+}
+
+.arrow-icon {
+  color: #fff;
 }
 </style>
