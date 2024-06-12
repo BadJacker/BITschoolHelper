@@ -1,5 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import slideShow1 from '@/assets/img/slideShow1.png'
+import slideShow2 from '@/assets/img/slideShow2.png'
+import slideShow3 from '@/assets/img/slideShow3.jpg'
+import noPic from '@/assets/img/noPic.png'
 
 //搜索值
 const value = ref('')
@@ -23,7 +27,7 @@ const recommendItems = ref([])
 
 onMounted(async () => {
   try {
-    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081')
+    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081/goods')
     recommendItems.value = await response.json()
   } catch (error) {
     console.error('Error fetching recommendList:', error)
@@ -35,8 +39,9 @@ const issueItems = ref([])
 
 onMounted(async () => {
   try {
-    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081')
-    issueItems.value = await response.json()
+    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081/goods')
+    const items = await response.json()
+    issueItems.value = items.filter((item) => item.type === 1)
   } catch (error) {
     console.error('Error fetching issueList:', error)
   }
@@ -47,8 +52,9 @@ const transactionItems = ref([])
 
 onMounted(async () => {
   try {
-    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081')
-    transactionItems.value = await response.json()
+    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081/goods')
+    const items = await response.json()
+    transactionItems.value = items.filter((item) => item.type === 2)
   } catch (error) {
     console.error('Error fetching transactionList:', error)
   }
@@ -59,8 +65,9 @@ const recruitmentItems = ref([])
 
 onMounted(async () => {
   try {
-    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081')
-    recruitmentItems.value = await response.json()
+    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081/goods')
+    const items = await response.json()
+    recruitmentItems.value = items.filter((item) => item.type === 3)
   } catch (error) {
     console.error('Error fetching recruitmentList:', error)
   }
@@ -100,10 +107,15 @@ const onLoad = () => {
     <van-tabs v-model:active="active" offset-top="54px" sticky lazy-render>
       <van-tab title="推荐">
         <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-          <van-swipe-item>1</van-swipe-item>
-          <van-swipe-item>2</van-swipe-item>
-          <van-swipe-item>3</van-swipe-item>
-          <van-swipe-item>4</van-swipe-item>
+          <van-swipe-item>
+            <img :src="slideShow1" alt="Slide 1" />
+          </van-swipe-item>
+          <van-swipe-item>
+            <img :src="slideShow2" alt="Slide 2" />
+          </van-swipe-item>
+          <van-swipe-item>
+            <img :src="slideShow3" alt="Slide 3" />
+          </van-swipe-item>
         </van-swipe>
         <van-pull-refresh
           v-model="isLoading"
@@ -124,12 +136,32 @@ const onLoad = () => {
                   :price="item.price.toFixed(2)"
                   :title="item.title"
                   :desc="item.intro"
-                  @click="$router.push('/product')"
+                    :thumb="
+                    item.images.length > 0 ? item.images[0]?.low_url : noPic
+                  "
+                  @click="
+                    $router.push({ name: 'Product', params: { id: item.id } })
+                  "
                 >
                   <template #tags>
                     <div class="time-container">
                       <van-icon name="notes-o" :size="`${3.5}vw`" />
-                      <div>发布时间 {{ item.time }}</div>
+                      <div>
+                        发布时间
+                        {{
+                          new Date(item.time).toLocaleDateString('zh-CN', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                          }) +
+                          ' ' +
+                          new Date(item.time).toLocaleTimeString('zh-CN', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                          })
+                        }}
+                      </div>
                     </div>
                   </template>
                 </van-card>
@@ -149,10 +181,15 @@ const onLoad = () => {
       </van-tab>
       <van-tab title="事务求助">
         <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-          <van-swipe-item>事务求助轮播1</van-swipe-item>
-          <van-swipe-item>事务求助轮播2</van-swipe-item>
-          <van-swipe-item>事务求助轮播3</van-swipe-item>
-          <van-swipe-item>事务求助轮播4</van-swipe-item>
+          <van-swipe-item>
+            <img :src="slideShow1" alt="Slide 1" />
+          </van-swipe-item>
+          <van-swipe-item>
+            <img :src="slideShow2" alt="Slide 2" />
+          </van-swipe-item>
+          <van-swipe-item>
+            <img :src="slideShow3" alt="Slide 3" />
+          </van-swipe-item>
         </van-swipe>
         <van-pull-refresh
           v-model="isLoading"
@@ -173,12 +210,32 @@ const onLoad = () => {
                   :price="item.price.toFixed(2)"
                   :title="item.title"
                   :desc="item.intro"
+                  :thumb="
+                    item.images.length > 0
+                      ? item.images[0]?.low_url
+                      : noPic
+                  "
                   @click="$router.push('/product')"
                 >
                   <template #tags>
                     <div class="time-container">
                       <van-icon name="notes-o" :size="`${3.5}vw`" />
-                      <div>发布时间 {{ item.time }}</div>
+                      <div>
+                        发布时间
+                        {{
+                          new Date(item.time).toLocaleDateString('zh-CN', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                          }) +
+                          ' ' +
+                          new Date(item.time).toLocaleTimeString('zh-CN', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                          })
+                        }}
+                      </div>
                     </div>
                   </template>
                 </van-card>
@@ -198,10 +255,15 @@ const onLoad = () => {
       </van-tab>
       <van-tab title="二手交易">
         <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-          <van-swipe-item>二手交易轮播1</van-swipe-item>
-          <van-swipe-item>二手交易轮播2</van-swipe-item>
-          <van-swipe-item>二手交易轮播3</van-swipe-item>
-          <van-swipe-item>二手交易轮播4</van-swipe-item>
+          <van-swipe-item>
+            <img :src="slideShow1" alt="Slide 1" />
+          </van-swipe-item>
+          <van-swipe-item>
+            <img :src="slideShow2" alt="Slide 2" />
+          </van-swipe-item>
+          <van-swipe-item>
+            <img :src="slideShow3" alt="Slide 3" />
+          </van-swipe-item>
         </van-swipe>
         <van-pull-refresh
           v-model="isLoading"
@@ -225,12 +287,32 @@ const onLoad = () => {
                   :price="item.price.toFixed(2)"
                   :title="item.title"
                   :desc="item.intro"
+                  :thumb="
+                    item.images.length > 0
+                      ? item.images[0]?.low_url
+                      : noPic
+                  "
                   @click="$router.push('/product')"
                 >
                   <template #tags>
                     <div class="time-container">
                       <van-icon name="notes-o" :size="`${3.5}vw`" />
-                      <div>发布时间 {{ item.time }}</div>
+                      <div>
+                        发布时间
+                        {{
+                          new Date(item.time).toLocaleDateString('zh-CN', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                          }) +
+                          ' ' +
+                          new Date(item.time).toLocaleTimeString('zh-CN', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                          })
+                        }}
+                      </div>
                     </div>
                   </template>
                 </van-card>
@@ -250,10 +332,15 @@ const onLoad = () => {
       </van-tab>
       <van-tab title="活动招聘">
         <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-          <van-swipe-item>活动招聘轮播1</van-swipe-item>
-          <van-swipe-item>活动招聘轮播2</van-swipe-item>
-          <van-swipe-item>活动招聘轮播3</van-swipe-item>
-          <van-swipe-item>活动招聘轮播4</van-swipe-item>
+          <van-swipe-item>
+            <img :src="slideShow1" alt="Slide 1" />
+          </van-swipe-item>
+          <van-swipe-item>
+            <img :src="slideShow2" alt="Slide 2" />
+          </van-swipe-item>
+          <van-swipe-item>
+            <img :src="slideShow3" alt="Slide 3" />
+          </van-swipe-item>
         </van-swipe>
         <van-pull-refresh
           v-model="isLoading"
@@ -277,12 +364,32 @@ const onLoad = () => {
                   :price="item.price.toFixed(2)"
                   :title="item.title"
                   :desc="item.intro"
+                  :thumb="
+                    item.images.length > 0
+                      ? item.images[0]?.low_url
+                      : noPic
+                  "
                   @click="$router.push('/product')"
                 >
                   <template #tags>
                     <div class="time-container">
                       <van-icon name="notes-o" :size="`${3.5}vw`" />
-                      <div>发布时间 {{ item.time }}</div>
+                      <div>
+                        发布时间
+                        {{
+                          new Date(item.time).toLocaleDateString('zh-CN', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                          }) +
+                          ' ' +
+                          new Date(item.time).toLocaleTimeString('zh-CN', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                          })
+                        }}
+                      </div>
                     </div>
                   </template>
                 </van-card>
@@ -315,9 +422,12 @@ const onLoad = () => {
 .my-swipe .van-swipe-item {
   color: #fff;
   font-size: 20px;
-  line-height: 200px;
   text-align: center;
-  background-color: #39a9ed;
+  background-color: #ffffff;
+}
+.img {
+  width: 100%;
+  object-fit: cover;
 }
 // 商品
 .goods-card {

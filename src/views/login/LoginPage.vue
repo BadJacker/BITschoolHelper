@@ -29,14 +29,39 @@ export default {
     };
   },
   methods: {
-    login() {
-      // 处理登录逻辑，例如调用 API 验证用户凭据
-      // 假设登录成功
-      this.$router.push('/layout/home');
+    async login() {
+      try {
+        const response = await fetch('http://dev.bit101.flwfdd.xyz:8081/user/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            sid: this.username,
+            password: this.password
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const fakeCookie = data.fake_cookie;
+          localStorage.setItem("fake-cookie", fakeCookie);
+          this.$router.push('/layout/home');
+        } else if (response.status === 400 || response.status === 500) {
+          // 处理登录失败的情况
+          console.error('登录失败');
+        } else {
+          // 处理其他 HTTP 状态码
+          console.error('发生错误');
+        }
+      } catch (error) {
+        console.error('发生错误', error);
+      }
     }
   }
 }
 </script>
+
 
 <style scoped>
 .login-container {
