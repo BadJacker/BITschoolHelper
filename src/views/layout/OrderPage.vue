@@ -68,7 +68,6 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import test from '@/assets/response.json'
 
 const fakeCookie = localStorage.getItem('fake-cookie') || ''
 
