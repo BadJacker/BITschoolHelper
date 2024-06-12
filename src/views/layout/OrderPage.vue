@@ -20,17 +20,13 @@
         >
         <div v-for="(item, index) in filteredList" :key="index" class="order-item-box">
           <div class="order-item-header">
-            <span>{{ getTagName(item[1].type) }}</span>
+            <span>{{ getTagName(item.type) }}</span>
           </div>
-          <div class="order-item-content" @click="goTo(item[1].id)">
+          <div class="order-item-content" @click="goTo(item.id)">
             <img class="order-item-image" :src="'https://fastly.jsdelivr.net/npm/@vant/assets/leaf.jpeg'" alt="商品图片" />
             <div class="order-item-info">
-              <div class="order-item-title">{{ item[1].title }}</div>
-              <div class="order-item-details">购买数量: {{ item[1].num }} 总价格: {{ item[1].price }}</div>
-              <!-- <div class="order-item-buttons" v-if="item[0] === 1">
-                <van-button type="primary" size="small" @click.stop="showRatingDialog(item)">确认完成</van-button>
-                <van-button type="default" size="small">取消订单</van-button>
-              </div> -->
+              <div class="order-item-title">{{ item.title }}</div>
+              <div class="order-item-details">购买数量: {{ item.num }} 总价格: {{ item.price }}</div>
             </div>
           </div>
         </div>
@@ -44,7 +40,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, watch } from 'vue';
+import { reactive, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 class Goods {
@@ -72,25 +68,16 @@ const state = reactive({
 });
 const filteredList = ref([]);
 
-const showRating = ref(false);
-const rating = ref(0);
-let currentItem = null;
-
-const loadData = async () => {
-  // 模拟固定的订单列表数据
-  const fixedList = [
-    [1, new Goods(1, '商品简介1', 10, 100, '2024-06-01 12:00:00', '商品1', 2, { name: '用户1' })],
-    [1, new Goods(2, '商品简介2', 5, 200, '2024-06-02 14:30:00', '商品2', 1, { name: '用户2' })],
-    [3, new Goods(3, '商品简介3', 1, 10, '2024-06-03 14:30:00', '商品3', 3, { name: '用户3' })],
-    [2, new Goods(4, '商品简介4', 50, 2, '2024-06-04 14:30:00', '商品4', 2, { name: '用户4' })]
-  ];
-
-  // 初始化订单列表
-  state.list = fixedList;
-
-  // 根据当前状态过滤订单列表
-  filterList();
-
+const loadData = async (status) => {
+  // 模拟根据订单状态获取数据
+  const statusMap = {
+    '1': [new Goods(1, '商品简介1', 10, 100, '2024-06-01 12:00:00', '商品1', 2, { name: '用户1' })],
+    '2': [new Goods(2, '商品简介2', 5, 200, '2024-06-02 14:30:00', '商品2', 1, { name: '用户2' })],
+    '3': [new Goods(3, '商品简介3', 1, 10, '2024-06-03 14:30:00', '商品3', 3, { name: '用户3' })],
+    '0': [new Goods(1, '商品简介1', 10, 100, '2024-06-01 12:00:00', '商品1', 2, { name: '用户1' }), new Goods(2, '商品简介2', 5, 200, '2024-06-02 14:30:00', '商品2', 1, { name: '用户2' }), new Goods(3, '商品简介3', 1, 10, '2024-06-03 14:30:00', '商品3', 3, { name: '用户3' })]
+  };
+  state.list = statusMap[status] || [];
+  filteredList.value = state.list; // 更新列表
   state.loading = false;
   if (state.page >= state.totalPage) {
     state.finished = true;
@@ -98,16 +85,10 @@ const loadData = async () => {
 };
 
 const onChangeTab = (name) => {
-  state.status = name;
-  filterList();
-};
-
-const filterList = () => {
-  if (state.status === '0') {
-    filteredList.value = state.list;
-  } else {
-    filteredList.value = state.list.filter(item => item[0] === parseInt(state.status));
-  }
+  state.loading = true;
+  state.finished = false; // 重置完成状态
+  state.page = 1; // 重置页数
+  loadData(name);
 };
 
 const goTo = (id) => {
@@ -117,7 +98,7 @@ const goTo = (id) => {
 const onLoad = () => {
   if (state.page < state.totalPage) {
     state.page += 1;
-    loadData();
+    loadData(state.status);
   }
 };
 
@@ -126,7 +107,7 @@ const onRefresh = () => {
   state.finished = false;
   state.loading = true;
   state.page = 1;
-  loadData().then(() => {
+  loadData(state.status).then(() => {
     state.refreshing = false;
   });
 };
@@ -144,24 +125,9 @@ const getTagName = (type) => {
   }
 };
 
-const showRatingDialog = (item) => {
-  currentItem = item;
-  showRating.value = true;
-};
-
-const onRateConfirm = () => {
-  // 处理评分逻辑，这里可以根据 rating 的值做相应的处理
-  // 关闭弹窗
-  showRating.value = false;
-};
-
-// 在组件加载时调用 loadData 函数
 onMounted(() => {
-  loadData();
+  loadData(state.status);
 });
-
-// 监听 status 变化并过滤列表
-watch(() => state.status, filterList);
 </script>
 
 <style lang="less" scoped>

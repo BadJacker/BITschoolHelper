@@ -6,7 +6,7 @@
           name="arrow-left"
           size="20"
           style="margin-left: 10px"
-          @click="onClick"
+          @click="onClickLeft"
         />
       </div>
       <strong>{{ userName }}</strong>

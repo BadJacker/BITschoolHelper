@@ -32,6 +32,11 @@ const onClick = () => history.back()
 const onClickButton = () => {
   console.log('联系卖家')
 }
+
+//立即下单按钮
+const onClickOrder = () => {
+  console.log('立即下单')
+}
 </script>
 
 <template>
@@ -78,14 +83,22 @@ const onClickButton = () => {
     </van-cell-group>
     <div class="fake"></div>
   </div>
-  <span class="contact"
-    ><van-button
+  <span class="contact">
+    <van-button
       @click="onClickButton"
       round
       text="联系卖家"
       color="linear-gradient(to right, #ff6034, #ee0a24)"
       class="contactButton"
-  /></span>
+    />
+    <van-button
+      @click="onClickOrder"
+      round
+      text="立即下单"
+      color="linear-gradient(to right, #34c759, #30b158)"
+      class="orderButton"
+    />
+  </span>
 </template>
 
 <style lang="less" scoped>
@@ -135,7 +148,7 @@ const onClickButton = () => {
   height: 50px;
   width: 100vw;
 }
-//联系卖家
+//联系卖家和立即下单
 .contact {
   bottom: 0px;
   height: 50px;
@@ -143,11 +156,19 @@ const onClickButton = () => {
   position: fixed;
   background-color: var(--van-background-2);
   z-index: 999;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  box-sizing: border-box;
   .contactButton {
     top: 5px;
     height: 40px;
-    width: 49vw;
-    left: 50vw;
+    width: 45vw;
+  }
+  .orderButton {
+    top: 5px;
+    height: 40px;
+    width: 45vw;
   }
 }
 </style>

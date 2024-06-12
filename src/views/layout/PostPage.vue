@@ -9,21 +9,7 @@ const onClickRight = () => {
 }
 
 //上传的图片
-const fileList = ref([
-  { url: 'https://fastly.jsdelivr.net/npm/@vant/assets/leaf.jpeg' },
-  // Uploader 根据文件后缀来判断是否为图片文件
-  // 如果图片 URL 中不包含类型信息，可以添加 isImage 标记来声明
-  {
-    url: 'https://fastly.jsdelivr.net/npm/@vant/assets/leaf.jpeg',
-    status: 'uploading',
-    message: '上传中...'
-  },
-  {
-    url: 'https://fastly.jsdelivr.net/npm/@vant/assets/tree.jpeg',
-    status: 'failed',
-    message: '上传失败'
-  }
-])
+const fileList = ref([])
 
 //最大上传大小
 const maxSize = ref(500 * 1024)
@@ -135,13 +121,13 @@ const formatter2 = (value) => {
           <template #input
             ><van-radio-group v-model="checked" direction="horizontal">
               <van-radio name="1" icon-size="15px" class="radio"
-                >单选框 1</van-radio
+                >事务求助</van-radio
               >
               <van-radio name="2" icon-size="15px" class="radio"
-                >单选框 2</van-radio
+                >二手交易</van-radio
               >
               <van-radio name="3" icon-size="15px" class="radio"
-                >单选框 3</van-radio
+                >活动招聘</van-radio
               >
             </van-radio-group>
           </template>

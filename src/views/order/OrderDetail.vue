@@ -6,7 +6,7 @@
     </div>
     <div class="order-tabs">
       <van-tabs v-model="active" type="card">
-        <van-tab title="订单状态" name="1"></van-tab>
+        <van-tab :title="getStatueName(order.state)" name="1"></van-tab>
       </van-tabs>
     </div>
     <div class="order-content">
@@ -34,7 +34,7 @@
         <van-button type="primary" size="small" @click="contactUser"
           >联系对方</van-button
         >
-        <van-button type="success" size="small" @click="showRatingDialog"
+        <van-button type="success" size="small" @click="goTo(order.id)"
           >确认完成</van-button
         >
         <van-button type="danger" size="small" @click="cancelOrder"
@@ -56,7 +56,7 @@
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
-import { useRouter, useRoute, Router } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { Tabs, Tab, Dialog, Rate } from 'vant'
 import noPic from '@/assets/img/noPic.png'
 
@@ -65,8 +65,6 @@ const route = useRoute()
 const order = ref('')
 
 const fakeCookie = localStorage.getItem('fake-cookie') || '';
-
-
 
 const fetchOrderDetail = (id) => {
   var myHeaders = new Headers()
@@ -79,7 +77,7 @@ const fetchOrderDetail = (id) => {
     redirect: 'follow'
   }
 
-  fetch(`http://127.0.0.1:4523/m1/4522279-4169800-default/orders/1`, requestOptions)
+  fetch(`http://127.0.0.1:4523/m1/4522279-4169800-default/orders/${id}`, requestOptions)
     .then((response) => response.json())
     .then((data) => {
       order.value = data
@@ -92,7 +90,9 @@ const goBack = () => {
   router.back()
 }
 
-const contactUser = () => {}
+const contactUser = () => {
+  router.push('/layout/message');
+};
 
 const confirmOrder = () => {}
 
@@ -111,9 +111,21 @@ const getTagName = (type) => {
   }
 }
 
-const showRatingDialog = () => {
-  //showRating.value = true
-  router.push({ name: 'Comment', params: { id: order.id } })
+const getStatueName = (type) => {
+  switch (type) {
+    case 1:
+      return '进行中'
+    case 2:
+      return '完成'
+    case 3:
+      return '撤销'
+    default:
+      return '其他类型'
+  }
+}
+
+const goTo = (id) => {
+  router.push({ path: '/comment', query: { id } });
 };
 
 onMounted(() => {
