@@ -1,3 +1,4 @@
+<!-- eslint-disable prettier/prettier -->
 <template>
   <div class="login-container">
     <h2 class="title">欢迎登录！</h2>
@@ -20,49 +21,54 @@
 </template>
 
 <script>
+import { showToast } from 'vant'
+
 export default {
   name: 'LoginPage',
   data() {
     return {
       username: '',
       password: ''
-    };
+    }
   },
   methods: {
     async login() {
       try {
-        const response = await fetch('http://dev.bit101.flwfdd.xyz:8081/user/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            sid: this.username,
-            password: this.password
-          })
-        });
+        const response = await fetch(
+          'http://dev.bit101.flwfdd.xyz:8081/user/login',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              sid: this.username,
+              password: this.password
+            })
+          }
+        )
 
         if (response.ok) {
-          const data = await response.json();
-          const fakeCookie = data.fake_cookie;
-          localStorage.setItem("fake-cookie", fakeCookie);
-          this.$router.push('/layout/home');
+          const data = await response.json()
+          const fakeCookie = data.fake_cookie
+          localStorage.setItem('fake-cookie', fakeCookie)
+          this.$router.push('/layout/user')
+          showToast('请先输入个人信息')
         } else if (response.status === 400 || response.status === 500) {
           // 处理登录失败的情况
-          alert('登录失败');
-          console.error('登录失败');
+          alert('登录失败')
+          console.error('登录失败')
         } else {
           // 处理其他 HTTP 状态码
-          console.error('发生错误');
+          console.error('发生错误')
         }
       } catch (error) {
-        console.error('发生错误', error);
+        console.error('发生错误', error)
       }
     }
   }
 }
 </script>
-
 
 <style scoped>
 .login-container {

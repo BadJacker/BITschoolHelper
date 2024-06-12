@@ -3,9 +3,41 @@ import { showToast } from 'vant'
 import { ref } from 'vue'
 import 'vant/es/toast/style'
 
+const fakeCookie = localStorage.getItem('fake-cookie') || ''
+
 // 发布按钮
 const onClickRight = () => {
-  showToast('发布成功')
+  const imageMids = fileList.value.map((file) => file.mid)
+
+  const payload = {
+    type: parseInt(checked.value),
+    title: title.value,
+    intro: description.value,
+    num: parseInt(number.value),
+    price: parseFloat(price.value),
+    image_mids: imageMids
+  }
+
+  fetch('http://dev.bit101.flwfdd.xyz:8081/goods', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Fake-Cookie': fakeCookie
+    },
+    body: JSON.stringify(payload)
+  })
+    .then((response) => {
+      if (response.ok) {
+        showToast('发布成功')
+        return response.json()
+      } else {
+        throw new Error('发布失败')
+      }
+    })
+    .catch((error) => {
+      console.error('发布失败:', error)
+      showToast('发布失败')
+    })
 }
 
 //上传的图片
@@ -17,16 +49,60 @@ const onOversize = () => {
   showToast('文件大小不能超过 500kb')
 }
 
-//上传动画，计时器仅为示例
+//上传图片
 const afterRead = (file) => {
   file.status = 'uploading'
   file.message = '上传中...'
 
-  setTimeout(() => {
-    file.status = 'successed'
-    // file.status = 'failed'
-    // file.message = '上传失败'
-  }, 1000)
+  const formData = new FormData()
+  formData.append('file', file.file)
+
+  var myHeaders = new Headers()
+  myHeaders.append('User-Agent', 'Apifox/1.0.0 (https://apifox.com)')
+  myHeaders.append('Fake-Cookie', fakeCookie)
+
+  var formdata = new FormData()
+  formdata.append('file', file.file)
+
+  var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: formdata,
+    redirect: 'follow'
+  }
+
+  fetch('http://dev.bit101.flwfdd.xyz:8081/upload/image', requestOptions)
+    .then((response) => response.json())
+    .then((data) => {
+      const updatedFileList = fileList.value.map((f) => {
+        if (f.file === file.file) {
+          return {
+            ...f,
+            status: 'successed',
+            message: '上传成功',
+            url: data.url,
+            mid: data.mid
+          }
+        }
+        return f
+      })
+      fileList.value = updatedFileList
+      console.log(fileList.value)
+    })
+    .catch((error) => {
+      const updatedFileList = fileList.value.map((f) => {
+        if (f.file === file.file) {
+          return {
+            ...f,
+            status: 'failed',
+            message: '上传失败'
+          }
+        }
+        return f
+      })
+      fileList.value = updatedFileList
+      console.log('error', error)
+    })
 }
 
 // 输入的内容

@@ -3,14 +3,24 @@
     <div class="order-header">
       <span class="order-name">我的订单</span>
     </div>
-    <van-tabs :color="'#1baeae'" :title-active-color="'#1baeae'" class="order-tab" v-model="state.status" @change="onChangeTab">
+    <van-tabs
+      :color="'#1baeae'"
+      :title-active-color="'#1baeae'"
+      class="order-tab"
+      v-model="state.status"
+      @change="onChangeTab"
+    >
       <van-tab title="进行中" name="1"></van-tab>
       <van-tab title="已完成" name="2"></van-tab>
       <van-tab title="已撤销" name="3"></van-tab>
       <van-tab title="全部" name="0"></van-tab>
     </van-tabs>
     <div class="content">
-      <van-pull-refresh v-model="state.refreshing" @refresh="onRefresh" class="order-list-refresh">
+      <van-pull-refresh
+        v-model="state.refreshing"
+        @refresh="onRefresh"
+        class="order-list-refresh"
+      >
         <van-list
           v-model:loading="state.loading"
           :finished="state.finished"
@@ -18,45 +28,66 @@
           @load="onLoad"
           :offset="10"
         >
-        <div v-for="(item, index) in filteredList" :key="index" class="order-item-box">
-          <div class="order-item-header">
-            <span>{{ getTagName(item.type) }}</span>
-          </div>
-          <div class="order-item-content" @click="goTo(item.id)">
-            <img class="order-item-image" :src="'https://fastly.jsdelivr.net/npm/@vant/assets/leaf.jpeg'" alt="商品图片" />
-            <div class="order-item-info">
-              <div class="order-item-title">{{ item.title }}</div>
-              <div class="order-item-details">购买数量: {{ item.num }} 总价格: {{ item.price }}</div>
+          <div
+            v-for="(item, index) in filteredList"
+            :key="index"
+            class="order-item-box"
+          >
+            <div class="order-item-header">
+              <span>{{ getTagName(item.type) }}</span>
+            </div>
+            <div class="order-item-content" @click="goTo(item.orderid)">
+              <img
+                class="order-item-image"
+                :src="item.image"
+                alt="商品图片"
+              />
+              <div class="order-item-info">
+                <div class="order-item-title">{{ item.title }}</div>
+                <div class="order-item-details">
+                  购买数量: {{ item.num }} 价格: {{ item.price }}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
         </van-list>
       </van-pull-refresh>
     </div>
   </div>
-  <van-dialog v-model:show="showRating" title="请评价" show-cancel-button show-confirm-button @confirm="onRateConfirm">
+  <van-dialog
+    v-model:show="showRating"
+    title="请评价"
+    show-cancel-button
+    show-confirm-button
+    @confirm="onRateConfirm"
+  >
     <van-rate v-model="rating" />
   </van-dialog>
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { reactive, ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import test from '@/assets/response.json'
+
+const fakeCookie = localStorage.getItem('fake-cookie') || ''
 
 class Goods {
-  constructor(id, intro, num, price, time, title, type, user) {
-    this.id = id;
-    this.intro = intro;
-    this.num = num;
-    this.price = price;
-    this.time = time;
-    this.title = title;
-    this.type = type;
-    this.user = user;
+  constructor(orderid, id, intro, num, price, time, title, type, user, image) {
+    this.orderid = orderid
+    this.id = id
+    this.intro = intro
+    this.num = num
+    this.price = price
+    this.time = time
+    this.title = title
+    this.type = type
+    this.user = user
+    this.image = image
   }
 }
 
-const router = useRouter();
+const router = useRouter()
 const state = reactive({
   status: '1',
   loading: false,
@@ -65,69 +96,106 @@ const state = reactive({
   list: [],
   page: 1,
   totalPage: 1 // 假设总页数为 1，需根据实际情况调整
-});
-const filteredList = ref([]);
+})
+const filteredList = ref([])
 
 const loadData = async (status) => {
-  // 模拟根据订单状态获取数据
-  const statusMap = {
-    '1': [new Goods(1, '商品简介1', 10, 100, '2024-06-01 12:00:00', '商品1', 2, { name: '用户1' })],
-    '2': [new Goods(2, '商品简介2', 5, 200, '2024-06-02 14:30:00', '商品2', 1, { name: '用户2' })],
-    '3': [new Goods(3, '商品简介3', 1, 10, '2024-06-03 14:30:00', '商品3', 3, { name: '用户3' })],
-    '0': [new Goods(1, '商品简介1', 10, 100, '2024-06-01 12:00:00', '商品1', 2, { name: '用户1' }), new Goods(2, '商品简介2', 5, 200, '2024-06-02 14:30:00', '商品2', 1, { name: '用户2' }), new Goods(3, '商品简介3', 1, 10, '2024-06-03 14:30:00', '商品3', 3, { name: '用户3' })]
-  };
-  state.list = statusMap[status] || [];
-  filteredList.value = state.list; // 更新列表
-  state.loading = false;
-  if (state.page >= state.totalPage) {
-    state.finished = true;
+  state.loading = true
+
+  try {
+    const response = await fetch(`http://dev.bit101.flwfdd.xyz:8081/orders?state=${status}&page=${state.page}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Fake-Cookie': fakeCookie,
+      }
+    })
+    const data = await response.json()
+    //const data = test
+  
+    // 解析响应数据
+    const statusMap = {
+      1: [],
+      2: [],
+      3: [],
+      0: []
+    }
+
+    data.forEach((item) => {
+      const goods = new Goods(
+        item.id,
+        item.goods.id,
+        item.goods.intro,
+        item.goods.num,
+        item.goods.price,
+        item.goods.time,
+        item.goods.title,
+        item.goods.type,
+        item.goods.user,
+        item.goods.images[0].low_url
+      )
+
+      statusMap[item.state].push(goods)
+      statusMap[0].push(goods) // 将所有状态的商品也添加到状态0中
+    })
+
+    state.list = statusMap[status] || []
+    filteredList.value = state.list // 更新列表
+
+    state.loading = false
+    if (state.page >= state.totalPage) {
+      state.finished = true
+    }
+  } catch (error) {
+    console.error('加载数据失败:', error)
+    state.loading = false
   }
-};
+}
 
 const onChangeTab = (name) => {
-  state.loading = true;
-  state.finished = false; // 重置完成状态
-  state.page = 1; // 重置页数
-  loadData(name);
-};
+  state.loading = true
+  state.finished = false // 重置完成状态
+  state.page = 1 // 重置页数
+  loadData(name)
+}
 
 const goTo = (id) => {
-  router.push({ path: '/order', query: { id } });
-};
+  router.push({ path: '/order', query: { id } })
+}
 
 const onLoad = () => {
   if (state.page < state.totalPage) {
-    state.page += 1;
-    loadData(state.status);
+    state.page += 1
+    loadData(state.status)
   }
-};
+}
 
 const onRefresh = () => {
-  state.refreshing = true;
-  state.finished = false;
-  state.loading = true;
-  state.page = 1;
+  state.refreshing = true
+  state.finished = false
+  state.loading = true
+  state.page = 1
   loadData(state.status).then(() => {
-    state.refreshing = false;
-  });
-};
+    state.refreshing = false
+  })
+}
 
 const getTagName = (type) => {
   switch (type) {
     case 1:
-      return '事务求助';
+      return '事务求助'
     case 2:
-      return '二手交易';
+      return '二手交易'
     case 3:
-      return '活动招募';
+      return '活动招募'
     default:
-      return '';
+      return ''
   }
-};
+}
 
 onMounted(() => {
-  loadData(state.status);
-});
+  loadData(state.status)
+})
 </script>
 
 <style lang="less" scoped>

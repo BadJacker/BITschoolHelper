@@ -1,10 +1,13 @@
 <script setup>
 import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import noPic from '@/assets/img/noPic.png'
+import { showToast } from 'vant';
 
+const router = useRouter()
 const route = useRoute()
 const productID = route.params.id
+const fakeCookie = localStorage.getItem('fake-cookie') || ''
 
 const product = ref('')
 
@@ -21,7 +24,6 @@ fetch(`http://dev.bit101.flwfdd.xyz:8081/goods/${productID}`, requestOptions)
   .then((response) => response.json())
   .then((data) => {
     product.value = data
-    console.log(data)
   })
   .catch((error) => console.log('error', error))
 
@@ -30,12 +32,36 @@ const onClick = () => history.back()
 
 //联系卖家按钮
 const onClickButton = () => {
-  console.log('联系卖家')
+  router.push({name: 'Message', query: {oppositeID: product.value.user.id} })
 }
 
 //立即下单按钮
-const onClickOrder = () => {
-  console.log('立即下单')
+const onClickOrder = async () => {
+  try {
+    const response = await fetch(`http://dev.bit101.flwfdd.xyz:8081/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Fake-Cookie': fakeCookie
+      },
+      body: JSON.stringify({
+        goods: parseInt(productID)
+      })
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      console.log('订单创建成功:', data)
+      showToast('订单创建成功')
+      router.push('../layout/order')
+      return data
+    } else {
+      throw new Error('订单创建失败')
+    }
+  } catch (error) {
+    console.error('创建订单时发生错误:', error)
+    throw error
+  }
 }
 </script>
 
@@ -85,7 +111,7 @@ const onClickOrder = () => {
   </div>
   <span class="contact">
     <van-button
-      @click="onClickButton"
+      @click="onClickButton(product.user?.id)"
       round
       text="联系卖家"
       color="linear-gradient(to right, #ff6034, #ee0a24)"
@@ -112,6 +138,10 @@ const onClickOrder = () => {
   position: fixed;
 }
 //轮播图
+.my-swipe {
+  width: 100%;
+  height: 40vw;
+}
 .my-swipe .van-swipe-item {
   color: #fff;
   font-size: 20px;
@@ -120,7 +150,8 @@ const onClickOrder = () => {
 }
 .swipe-image {
   width: 100%;
-  object-fit: cover;
+  height: 100%;
+  object-fit: contain;
 }
 //价格行
 .price {

@@ -13,7 +13,11 @@
       <div class="order-info">
         <div class="order-image">
           <img
-            :src="order?.goods?.images && order?.goods?.images?.length > 0 ? order?.goods?.images[0].url : noPic"
+            :src="
+              order?.goods?.images && order?.goods?.images?.length > 0
+                ? order?.goods?.images[0].url
+                : noPic
+            "
             alt="商品图片"
           />
         </div>
@@ -29,17 +33,6 @@
         <p><strong>订单创建时间:</strong> {{ order.time }}</p>
         <p><strong>发布用户:</strong> {{ order.goods?.user?.nickname }}</p>
         <p><strong>接受用户:</strong> 我</p>
-      </div>
-      <div class="order-actions">
-        <van-button type="primary" size="small" @click="contactUser"
-          >联系对方</van-button
-        >
-        <van-button type="success" size="small" @click="goTo(order.id)"
-          >确认完成</van-button
-        >
-        <van-button type="danger" size="small" @click="cancelOrder"
-          >取消订单</van-button
-        >
       </div>
     </div>
     <van-dialog
@@ -72,19 +65,20 @@
 </template>
 
 <script setup>
-//import { ref } from 'vue'
-import { reactive, ref, onMounted } from 'vue'
+import { showToast } from 'vant';
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
-const fakeCookie = localStorage.getItem('fake-cookie') || '';
+const fakeCookie = localStorage.getItem('fake-cookie') || ''
 const order = ref('')
+const orderID = route.query.id
 
-const fetchOrderDetail = (id) => {
+const fetchOrderDetail = (orderID) => {
   var myHeaders = new Headers()
   myHeaders.append('User-Agent', 'Apifox/1.0.0 (https://apifox.com)')
-  myHeaders.append("Fake-Cookie", fakeCookie )
+  myHeaders.append('Fake-Cookie', fakeCookie)
 
   var requestOptions = {
     method: 'GET',
@@ -92,7 +86,7 @@ const fetchOrderDetail = (id) => {
     redirect: 'follow'
   }
 
-  fetch(`http://127.0.0.1:4523/m1/4522279-4169800-default/orders/${id}`, requestOptions)
+  fetch(`http://dev.bit101.flwfdd.xyz:8081/orders/${orderID}`, requestOptions)
     .then((response) => response.json())
     .then((data) => {
       order.value = data
@@ -106,8 +100,7 @@ const goBack = () => {
 }
 
 onMounted(() => {
-  const orderId = route.query.id
-  fetchOrderDetail(orderId)
+  fetchOrderDetail(orderID)
 })
 
 const getTagName = (type) => {
@@ -138,8 +131,6 @@ const getStatueName = (type) => {
 
 const star = ref(3)
 const content = ref('')
-//TODO
-const orderId = ref(1)
 const commentInput = ref(null) // 用于引用文本框元素
 
 const submit = () => {
@@ -154,10 +145,7 @@ const submit = () => {
   var myHeaders = new Headers()
   myHeaders.append('User-Agent', 'Apifox/1.0.0 (https://apifox.com)')
   myHeaders.append('Content-Type', 'application/json')
-  myHeaders.append(
-    'Fake-Cookie',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMiLCJleHAiOjE3MTk4MjYwMTgsImFkbWluIjpmYWxzZX0.kXlzy4EjJfCB-ViANhdRMRrp_lM5_ICXGg-y090g1Ho'
-  )
+  myHeaders.append('Fake-Cookie', fakeCookie)
 
   var raw = JSON.stringify({
     star: star.value,
@@ -172,12 +160,19 @@ const submit = () => {
   }
 
   fetch(
-    `http://dev.bit101.flwfdd.xyz:8081/orders/review/${orderId.value}`,
+    `http://dev.bit101.flwfdd.xyz:8081/orders/review/${orderID}`,
     requestOptions
   )
     .then((response) => response.text())
-    .then((result) => console.log(result))
-    .catch((error) => console.log('error', error))
+    .then((result) => {
+      console.log(result)
+      router.push('/layout/order')
+      showToast('评论成功')
+    })
+    .catch((error) => {
+      showToast('评论失败')
+      console.log('error', error)}
+    )
 }
 
 onMounted(() => {

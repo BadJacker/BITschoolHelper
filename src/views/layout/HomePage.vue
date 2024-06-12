@@ -108,13 +108,13 @@ const onLoad = () => {
       <van-tab title="推荐">
         <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
           <van-swipe-item>
-            <img :src="slideShow1" alt="Slide 1" />
+            <img :src="slideShow1" alt="Slide 1" class="swipe-image" />
           </van-swipe-item>
           <van-swipe-item>
-            <img :src="slideShow2" alt="Slide 2" />
+            <img :src="slideShow2" alt="Slide 2" class="swipe-image" />
           </van-swipe-item>
           <van-swipe-item>
-            <img :src="slideShow3" alt="Slide 3" />
+            <img :src="slideShow3" alt="Slide 3" class="swipe-image" />
           </van-swipe-item>
         </van-swipe>
         <van-pull-refresh
@@ -136,7 +136,7 @@ const onLoad = () => {
                   :price="item.price.toFixed(2)"
                   :title="item.title"
                   :desc="item.intro"
-                    :thumb="
+                  :thumb="
                     item.images.length > 0 ? item.images[0]?.low_url : noPic
                   "
                   @click="
@@ -182,13 +182,13 @@ const onLoad = () => {
       <van-tab title="事务求助">
         <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
           <van-swipe-item>
-            <img :src="slideShow1" alt="Slide 1" />
+            <img :src="slideShow1" alt="Slide 1" class="swipe-image" />
           </van-swipe-item>
           <van-swipe-item>
-            <img :src="slideShow2" alt="Slide 2" />
+            <img :src="slideShow2" alt="Slide 2" class="swipe-image" />
           </van-swipe-item>
           <van-swipe-item>
-            <img :src="slideShow3" alt="Slide 3" />
+            <img :src="slideShow3" alt="Slide 3" class="swipe-image" />
           </van-swipe-item>
         </van-swipe>
         <van-pull-refresh
@@ -211,9 +211,7 @@ const onLoad = () => {
                   :title="item.title"
                   :desc="item.intro"
                   :thumb="
-                    item.images.length > 0
-                      ? item.images[0]?.low_url
-                      : noPic
+                    item.images.length > 0 ? item.images[0]?.low_url : noPic
                   "
                   @click="$router.push('/product')"
                 >
@@ -256,13 +254,13 @@ const onLoad = () => {
       <van-tab title="二手交易">
         <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
           <van-swipe-item>
-            <img :src="slideShow1" alt="Slide 1" />
+            <img :src="slideShow1" alt="Slide 1" class="swipe-image" />
           </van-swipe-item>
           <van-swipe-item>
-            <img :src="slideShow2" alt="Slide 2" />
+            <img :src="slideShow2" alt="Slide 2" class="swipe-image" />
           </van-swipe-item>
           <van-swipe-item>
-            <img :src="slideShow3" alt="Slide 3" />
+            <img :src="slideShow3" alt="Slide 3" class="swipe-image" />
           </van-swipe-item>
         </van-swipe>
         <van-pull-refresh
@@ -288,9 +286,7 @@ const onLoad = () => {
                   :title="item.title"
                   :desc="item.intro"
                   :thumb="
-                    item.images.length > 0
-                      ? item.images[0]?.low_url
-                      : noPic
+                    item.images.length > 0 ? item.images[0]?.low_url : noPic
                   "
                   @click="$router.push('/product')"
                 >
@@ -333,13 +329,13 @@ const onLoad = () => {
       <van-tab title="活动招聘">
         <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
           <van-swipe-item>
-            <img :src="slideShow1" alt="Slide 1" />
+            <img :src="slideShow1" alt="Slide 1" class="swipe-image" />
           </van-swipe-item>
           <van-swipe-item>
-            <img :src="slideShow2" alt="Slide 2" />
+            <img :src="slideShow2" alt="Slide 2" class="swipe-image" />
           </van-swipe-item>
           <van-swipe-item>
-            <img :src="slideShow3" alt="Slide 3" />
+            <img :src="slideShow3" alt="Slide 3" class="swipe-image" />
           </van-swipe-item>
         </van-swipe>
         <van-pull-refresh
@@ -365,9 +361,7 @@ const onLoad = () => {
                   :title="item.title"
                   :desc="item.intro"
                   :thumb="
-                    item.images.length > 0
-                      ? item.images[0]?.low_url
-                      : noPic
+                    item.images.length > 0 ? item.images[0]?.low_url : noPic
                   "
                   @click="$router.push('/product')"
                 >
@@ -419,15 +413,20 @@ const onLoad = () => {
   z-index: 999;
 }
 // 轮播
+.my-swipe {
+  width: 100%;
+  height: 40vw;
+}
 .my-swipe .van-swipe-item {
   color: #fff;
   font-size: 20px;
   text-align: center;
   background-color: #ffffff;
 }
-.img {
+.swipe-image {
   width: 100%;
-  object-fit: cover;
+  height: 100%;
+  object-fit: contain;
 }
 // 商品
 .goods-card {

@@ -20,7 +20,6 @@
       </div>
     </div>
     <div class="content_box" id="box" ref="scrollBox">
-      <div class="timer">2024-06-04 11:08:07</div>
       <div
         :class="item.position == 'left' ? 'userbox2' : 'userbox'"
         v-for="(item, index) in chatList"
@@ -79,7 +78,11 @@ import userPic7 from '@/assets/img/userPic7.jpeg'
 import userPic8 from '@/assets/img/userPic8.jpg'
 import userPic9 from '@/assets/img/userPic9.png'
 import userPic10 from '@/assets/img/userPic10.jpg'
+import { ref } from 'vue';
+import { useRoute } from 'vue-router';
 
+//const route = useRoute();
+//const oppositeID = route.params.id;
 const fakeCookie = localStorage.getItem('fake-cookie') || '';
 export default {
   data() {
@@ -94,7 +97,6 @@ export default {
         // 其他好友数据
       ],
       //TODO
-      peerID: 1,
       fakeCookie: localStorage.getItem('fake-cookie'),
       showSidebar: false
     };
@@ -108,7 +110,7 @@ export default {
       this.showSidebar = !this.showSidebar;
     },
     onClickLeft() {
-      this.$router.push('/layout/home');
+      this.$router.back();
     },
     onClickRight() {
       console.log("按钮");
@@ -132,7 +134,7 @@ export default {
         this.scrollToBottom();
         // 发送请求到API
         try {
-          const response = await fetch(`http://dev.bit101.flwfdd.xyz:8081/chats/${this.peerID}`, {
+          const response = await fetch(`http://dev.bit101.flwfdd.xyz:8081/chats/${this.oppositeID}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -140,7 +142,7 @@ export default {
             },
             body: JSON.stringify({
               content: newMessage.content,
-              type: 1
+              type: "1"
             })
           });
 
@@ -165,7 +167,7 @@ export default {
     },
     async fetchAndTransformData() {
       try {
-        const response = await fetch(`http://dev.bit101.flwfdd.xyz:8081/chats/${this.peerID}`, {
+        const response = await fetch(`http://dev.bit101.flwfdd.xyz:8081/chats/${this.oppositeID}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -180,7 +182,7 @@ export default {
             url: item.sender.avatar,
             username: item.sender.nickname,
             content: item.content,
-            position: item.sender.id === this.peerID ? 'left' : 'right',
+            position: item.sender.id === this.oppositeID ? 'left' : 'right',
           };
         });
 

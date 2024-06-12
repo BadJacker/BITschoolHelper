@@ -13,10 +13,12 @@ import userPic8 from '@/assets/img/userPic8.jpg'
 import userPic9 from '@/assets/img/userPic9.png'
 import userPic10 from '@/assets/img/userPic10.jpg'
 
-
-
 const showPopover = ref(false)
-const src = ref(userPic1)
+const src = ref(localStorage.getItem('avatar') || '')
+const nameValue = ref(localStorage.getItem('name') || '请输入昵称')
+const telValue = ref(localStorage.getItem('telephone') || '请输入电话')
+const desValue = ref(localStorage.getItem('description') || '请输入简介')
+
 const srcs = ref([
   { src: userPic1 },
   { src: userPic2 },
@@ -32,14 +34,14 @@ const srcs = ref([
 const changePic = async (Src) => {
   showPopover.value = false
   src.value = Src
-  await sendUpdateToBackend({ avatar: Src });
+  await sendUpdateToBackend({ avatar: Src })
+  localStorage.setItem('avatar', Src)
   showToast('修改成功')
 }
 
 // 修改昵称
 const notChangeName = ref(true)
 const nameInput = ref(null)
-const nameValue = ref('昵称')
 const toChangeName = async () => {
   notChangeName.value = false
   await nextTick()
@@ -47,14 +49,14 @@ const toChangeName = async () => {
 }
 const changeName = async () => {
   notChangeName.value = true
-  await sendUpdateToBackend({ name: nameValue.value });
+  await sendUpdateToBackend({ name: nameValue.value })
+  localStorage.setItem('name', nameValue.value)
   showToast('修改成功')
 }
 
 // 修改电话
 const notChangeTel = ref(true)
 const telInput = ref(null)
-const telValue = ref(12345678910)
 const toChangeTel = async () => {
   notChangeTel.value = false
   await nextTick()
@@ -62,16 +64,14 @@ const toChangeTel = async () => {
 }
 const changeTel = async () => {
   notChangeTel.value = true
-  await sendUpdateToBackend({ telephone: telValue.value });
+  await sendUpdateToBackend({ telephone: telValue.value })
+  localStorage.setItem('telephone', telValue.value)
   showToast('修改成功')
 }
 
 // 修改简介
 const notChangeDes = ref(true)
 const desInput = ref(null)
-const desValue = ref(
-  '请输入简介'
-)
 const desText = computed(() => {
   return '简介：' + desValue.value
 })
@@ -82,33 +82,36 @@ const toChangeDes = async () => {
 }
 const changeDes = async () => {
   notChangeDes.value = true
-  await sendUpdateToBackend({ description: desValue.value });
+  await sendUpdateToBackend({ description: desValue.value })
+  localStorage.setItem('description', desValue.value)
   showToast('修改成功')
 }
 
 const sendUpdateToBackend = async (updateData) => {
-  const fakeCookie = localStorage.getItem('fake-cookie') || '';
+  const fakeCookie = localStorage.getItem('fake-cookie') || ''
   try {
-    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081/user/info', {
-      method: 'POST',
-      headers: {
-        'Fake-Cookie': fakeCookie,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updateData),
-    });
-    
+    const response = await fetch(
+      'http://dev.bit101.flwfdd.xyz:8081/user/info',
+      {
+        method: 'POST',
+        headers: {
+          'Fake-Cookie': fakeCookie,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      }
+    )
+
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error('Network response was not ok')
     }
-    
-    const result = await response.json();
-    console.log('Server response:', result);
+
+    const result = await response.json()
+    console.log('Server response:', result)
   } catch (error) {
-    console.error('There was a problem with the fetch operation:', error);
+    console.error('There was a problem with the fetch operation:', error)
   }
 }
-
 
 // 信用分
 const currentRate = ref(0)
@@ -127,20 +130,20 @@ const comments = ref([
     src: userPic2,
     username: 'Alice',
     time: '2024.6.4',
-    commentText: '很好',
+    commentText: '很好'
   },
   {
     src: userPic3,
     username: 'Bob',
     time: '2024.5.21',
-    commentText: 'nice',
+    commentText: 'nice'
   },
   {
     src: userPic4,
     username: 'Charlie',
     time: '2024.6.5',
-    commentText: '好评',
-  },
+    commentText: '好评'
+  }
 ])
 
 // 列表下拉加载
@@ -247,12 +250,7 @@ const onLoad = () => {
         />
       </van-col>
       <van-col span="1">
-        <van-icon
-          name="edit"
-          class="edit"
-          size="15px"
-          @click="toChangeName"
-        />
+        <van-icon name="edit" class="edit" size="15px" @click="toChangeName" />
         <van-icon
           name="edit"
           class="edit"
@@ -289,7 +287,11 @@ const onLoad = () => {
       finished-text="没有更多了"
       @load="onLoad"
     >
-      <div v-for="(comment, index) in comments.slice(0, 3)" :key="index" class="comment">
+      <div
+        v-for="(comment, index) in comments.slice(0, 3)"
+        :key="index"
+        class="comment"
+      >
         <van-row class="header">
           <van-col span="3">
             <van-image
@@ -404,7 +406,6 @@ const onLoad = () => {
     line-height: var(--van-line-height-md);
   }
 }
-
 </style>
 <style>
 :root {
