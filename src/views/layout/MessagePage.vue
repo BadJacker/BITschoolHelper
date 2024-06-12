@@ -6,7 +6,7 @@
           name="arrow-left"
           size="20"
           style="margin-left: 10px"
-          @click="onClickRight"
+          @click="onClick"
         />
       </div>
       <strong>{{ userName }}</strong>
@@ -80,89 +80,11 @@ import userPic8 from '@/assets/img/userPic8.jpg'
 import userPic9 from '@/assets/img/userPic9.png'
 import userPic10 from '@/assets/img/userPic10.jpg'
 
+const fakeCookie = localStorage.getItem('fake-cookie') || '';
 export default {
   data() {
     return {
-      chatList: [
-        {
-          url: userPic2,
-          username: "Alice",
-          content: "23333·123233331232333312323333123",
-          position: "left",
-        },
-        {
-          url: userPic1,
-          username: "我",
-          content: "2333312323333123233331232333312323333123",
-          position: "right",
-        },
-        {
-          url: userPic2,
-          username: "Alice",
-          content: "23333123",
-          position: "left",
-        },
-        {
-          url: userPic1,
-          username: "我",
-          content: "2333312323333",
-          position: "right",
-        },
-        {
-          url: userPic1,
-          username: "我",
-          content: "2333312323333",
-          position: "right",
-        },
-        {
-          url: userPic2,
-          username: "Alice",
-          content: "23333123",
-          position: "left",
-        },
-        {
-          url: userPic1,
-          username: "我",
-          content: "2333312323333",
-          position: "right",
-        },
-        {
-          url: userPic2,
-          username: "Alice",
-          content: "23333123",
-          position: "left",
-        },
-        {
-          url: userPic1,
-          username: "我",
-          content: "2333312323333",
-          position: "right",
-        },
-        {
-          url: userPic2,
-          username: "Alice",
-          content: "23333123",
-          position: "left",
-        },
-        {
-          url: userPic1,
-          username: "我",
-          content: "2333312323333",
-          position: "right",
-        },
-        {
-          url: userPic2,
-          username: "Alice",
-          content: "23333123",
-          position: "left",
-        },
-        {
-          url: userPic1,
-          username: "我",
-          content: "2333312323333",
-          position: "right",
-        },
-      ],
+      chatList: [],
       userName: "Alice",
       inputValue: "",
       friendsList: [
@@ -171,18 +93,22 @@ export default {
         { name: "Charlie", avatar: userPic4 },
         // 其他好友数据
       ],
+      //TODO
+      peerID: 1,
+      fakeCookie: localStorage.getItem('fake-cookie'),
       showSidebar: false
     };
   },
   mounted() {
     this.scrollToBottom();
+    this.fetchAndTransformData()
   },
   methods: {
     toggleSidebar() {
       this.showSidebar = !this.showSidebar;
     },
     onClickLeft() {
-      console.log("返回");
+      this.$router.push('/layout/home');
     },
     onClickRight() {
       console.log("按钮");
@@ -193,7 +119,7 @@ export default {
         scrollBox.scrollTop = scrollBox.scrollHeight;
       });
     },
-    sendOut() {
+    async sendOut() {
       if (this.inputValue.trim() !== "") {
         const newMessage = {
           url: userPic1,
@@ -204,7 +130,27 @@ export default {
         this.chatList.push(newMessage);
         this.inputValue = "";
         this.scrollToBottom();
-        console.log('发送成功');
+        // 发送请求到API
+        try {
+          const response = await fetch(`http://dev.bit101.flwfdd.xyz:8081/chats/${this.peerID}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Fake-cookie': fakeCookie
+            },
+            body: JSON.stringify({
+              content: newMessage.content,
+              type: 1
+            })
+          });
+
+          const responseData = await response.json();
+          console.log('发送成功', responseData);
+        } catch (error) {
+          console.error('There was a problem with the fetch operation:', error);
+        }
+
+        this.inputValue = "";
       }
     },
     selectFriend(friend) {
@@ -216,6 +162,32 @@ export default {
         }
       });
       this.showSidebar = false;
+    },
+    async fetchAndTransformData() {
+      try {
+        const response = await fetch(`http://dev.bit101.flwfdd.xyz:8081/chats/${this.peerID}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Fake-cookie' : this.fakeCookie
+          },
+        });
+
+        const data = await response.json();
+
+        const transformedChatList = data.map(item => {
+          return {
+            url: item.sender.avatar,
+            username: item.sender.nickname,
+            content: item.content,
+            position: item.sender.id === this.peerID ? 'left' : 'right',
+          };
+        });
+
+        this.chatList = transformedChatList;
+      } catch (error) {
+        console.error('Error', error);
+      }
     }
   }
 };

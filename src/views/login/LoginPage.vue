@@ -49,6 +49,7 @@ export default {
           this.$router.push('/layout/home');
         } else if (response.status === 400 || response.status === 500) {
           // 处理登录失败的情况
+          alert('登录失败');
           console.error('登录失败');
         } else {
           // 处理其他 HTTP 状态码

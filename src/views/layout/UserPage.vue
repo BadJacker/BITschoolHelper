@@ -12,7 +12,9 @@ import userPic7 from '@/assets/img/userPic7.jpeg'
 import userPic8 from '@/assets/img/userPic8.jpg'
 import userPic9 from '@/assets/img/userPic9.png'
 import userPic10 from '@/assets/img/userPic10.jpg'
-// 修改头像
+
+
+
 const showPopover = ref(false)
 const src = ref(userPic1)
 const srcs = ref([
@@ -27,11 +29,13 @@ const srcs = ref([
   { src: userPic9 },
   { src: userPic10 }
 ])
-const changePic = (Src) => {
+const changePic = async (Src) => {
   showPopover.value = false
   src.value = Src
+  await sendUpdateToBackend({ avatar: Src });
   showToast('修改成功')
 }
+
 // 修改昵称
 const notChangeName = ref(true)
 const nameInput = ref(null)
@@ -41,10 +45,12 @@ const toChangeName = async () => {
   await nextTick()
   nameInput.value.focus()
 }
-const changeName = () => {
+const changeName = async () => {
   notChangeName.value = true
+  await sendUpdateToBackend({ name: nameValue.value });
   showToast('修改成功')
 }
+
 // 修改电话
 const notChangeTel = ref(true)
 const telInput = ref(null)
@@ -54,15 +60,17 @@ const toChangeTel = async () => {
   await nextTick()
   telInput.value.focus()
 }
-const changeTel = () => {
+const changeTel = async () => {
   notChangeTel.value = true
+  await sendUpdateToBackend({ telephone: telValue.value });
   showToast('修改成功')
 }
+
 // 修改简介
 const notChangeDes = ref(true)
 const desInput = ref(null)
 const desValue = ref(
-  '简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介'
+  '请输入简介'
 )
 const desText = computed(() => {
   return '简介：' + desValue.value
@@ -72,10 +80,36 @@ const toChangeDes = async () => {
   await nextTick()
   desInput.value.focus()
 }
-const changeDes = () => {
+const changeDes = async () => {
   notChangeDes.value = true
+  await sendUpdateToBackend({ description: desValue.value });
   showToast('修改成功')
 }
+
+const sendUpdateToBackend = async (updateData) => {
+  const fakeCookie = localStorage.getItem('fake-cookie') || '';
+  try {
+    const response = await fetch('http://dev.bit101.flwfdd.xyz:8081/user/info', {
+      method: 'POST',
+      headers: {
+        'Fake-Cookie': fakeCookie,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    
+    const result = await response.json();
+    console.log('Server response:', result);
+  } catch (error) {
+    console.error('There was a problem with the fetch operation:', error);
+  }
+}
+
+
 // 信用分
 const currentRate = ref(0)
 const gradientColor = {
@@ -83,8 +117,32 @@ const gradientColor = {
   '100%': '#6149f6'
 }
 const rate = ref(75)
-//评论评分
+
+// 评论评分
 const value = ref(3)
+
+// 评论内容
+const comments = ref([
+  {
+    src: userPic2,
+    username: 'Alice',
+    time: '2024.6.4',
+    commentText: '很好',
+  },
+  {
+    src: userPic3,
+    username: 'Bob',
+    time: '2024.5.21',
+    commentText: 'nice',
+  },
+  {
+    src: userPic4,
+    username: 'Charlie',
+    time: '2024.6.5',
+    commentText: '好评',
+  },
+])
+
 // 列表下拉加载
 const loading = ref(false)
 const finished = ref(false)
@@ -188,8 +246,13 @@ const onLoad = () => {
           @blur="changeDes"
         />
       </van-col>
-      <van-col span="1"
-        ><van-icon name="edit" class="edit" size="15px" @click="toChangeName" />
+      <van-col span="1">
+        <van-icon
+          name="edit"
+          class="edit"
+          size="15px"
+          @click="toChangeName"
+        />
         <van-icon
           name="edit"
           class="edit"
@@ -219,56 +282,28 @@ const onLoad = () => {
         />
       </van-col>
     </van-row>
-    <div class="order">
-      <van-row>
-        <van-col span="6" class="title">我的订单</van-col>
-        <van-col
-          span="3"
-          offset="15"
-          class="all"
-          @click="$router.push('/layout/order')"
-          >全部<van-icon name="arrow"
-        /></van-col>
-      </van-row>
-      <van-row>
-        <van-col span="6" class="iconCol" @click="$router.push('/layout/order')"
-          ><van-icon name="credit-pay" size="25px" class="icon" />
-          <div class="iconText">待付款</div></van-col
-        >
-        <van-col span="6" class="iconCol" @click="$router.push('/layout/order')"
-          ><van-icon name="records-o" size="25px" class="icon" />
-          <div class="iconText">待处理</div></van-col
-        >
-        <van-col span="6" class="iconCol" @click="$router.push('/layout/order')"
-          ><van-icon name="chat-o" size="25px" class="icon" />
-          <div class="iconText">待评价</div></van-col
-        >
-        <van-col span="6" class="iconCol" @click="$router.push('/layout/order')"
-          ><van-icon name="after-sale" size="25px" class="icon" />
-          <div class="iconText2">异常订单</div></van-col
-        >
-      </van-row>
-    </div>
+    <van-divider content-position="center" color="#ebedf0" />
     <van-list
       v-model:loading="loading"
       :finished="finished"
       finished-text="没有更多了"
       @load="onLoad"
     >
-      <div v-for="(item, index) in srcs" :key="index" class="comment">
+      <div v-for="(comment, index) in comments.slice(0, 3)" :key="index" class="comment">
         <van-row class="header">
-          <van-col span="3"
-            ><van-image
+          <van-col span="3">
+            <van-image
               round
               width="10vw"
               height="10vw"
               lazy-load
               class="img"
-              :src="item.src"
-          /></van-col>
-          <van-col span="20"
-            ><div class="username">评论人</div>
-            <div class="time">2024.5.20</div>
+              :src="comment.src"
+            />
+          </van-col>
+          <van-col span="20">
+            <div class="username">{{ comment.username }}</div>
+            <div class="time">{{ comment.time }}</div>
           </van-col>
         </van-row>
         <van-rate
@@ -281,7 +316,7 @@ const onLoad = () => {
           gutter="0"
           readonly
         />
-        <div class="commentText">我是评论</div>
+        <div class="commentText">{{ comment.commentText }}</div>
         <van-divider />
       </div>
     </van-list>
@@ -337,44 +372,7 @@ const onLoad = () => {
     margin-left: 10px;
   }
 }
-// 订单模块
-.order {
-  height: 105px;
-  width: 96vw;
-  // background-color: #fff;
-  background-color: #f5f5f5;
-  border-radius: 5px;
-  margin: 10px 2vw 0;
-  .title {
-    padding-top: 10px;
-    padding-left: 3vw;
-    font-size: 0.9rem;
-    color: var(--van-text-color);
-    line-height: var(--van-line-height-md);
-  }
-  .all {
-    padding-top: 10px;
-    font-size: var(--van-font-size-sm);
-    color: var(--van-text-color-2);
-  }
-  .iconCol {
-    padding-left: 5vw;
-    padding-top: 5px;
-    .icon {
-      padding: 5px 0;
-      padding-left: 3vw;
-    }
-    .iconText {
-      padding-top: 2px;
-      padding-left: 1.4vw;
-      font-size: var(--van-font-size-sm);
-    }
-    .iconText2 {
-      padding-top: 2px;
-      font-size: var(--van-font-size-sm);
-    }
-  }
-}
+
 // 评论模块
 .comment {
   width: 100vw;
@@ -384,7 +382,7 @@ const onLoad = () => {
   }
   .username {
     padding-top: 2px;
-    font-size: 0.8rem;
+    font-size: 1rem; /* 修改字体大小 */
     font-weight: 550;
     color: var(--van-text-color);
     line-height: var(--van-line-height-md);
@@ -401,11 +399,12 @@ const onLoad = () => {
   .commentText {
     padding-top: 10px;
     padding-left: 10px;
-    font-size: 0.8rem;
+    font-size: 1rem; /* 修改字体大小 */
     color: var(--van-text-color);
     line-height: var(--van-line-height-md);
   }
 }
+
 </style>
 <style>
 :root {
